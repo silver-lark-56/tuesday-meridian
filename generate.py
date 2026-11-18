@@ -256,16 +256,18 @@ CONTINENTS = [
      (20, 32), (25, 32), (32, 31), (34, 28), (35, 23), (37, 18), (39, 15),
      (43, 11), (48, 11), (51, 10), (46, 5), (41, 0), (40, -5), (39, -10),
      (35, -18), (33, -22), (30, -26), (26, -34), (20, -35), (17, -32),
-     (15, -27), (12, -18), (13, -10), (9, -1), (9, 4), (4, 6), (-8, 4),
-     (-13, 8)],
+     (15, -27), (12, -18), (13, -12), (12, -6), (9, -1), (9, 4), (6, 5),
+     (4, 6), (-2, 5), (-8, 4), (-13, 8)],
     # Asia
     [(30, 70), (40, 73), (55, 73), (70, 73), (85, 75), (100, 77), (115, 73),
      (130, 72), (145, 72), (160, 70), (170, 67), (178, 65), (178, 62),
      (170, 60), (162, 56), (158, 52), (150, 50), (142, 45), (140, 40),
-     (135, 35), (130, 33), (127, 35), (122, 38), (120, 32), (122, 28),
+     (135, 35), (130, 33), (129, 35), (127, 38), (126, 40), (124, 40),
+     (122, 38), (120, 32), (122, 28),
      (118, 25), (110, 21), (108, 18), (105, 10), (103, 8), (100, 7),
-     (98, 10), (95, 16), (92, 22), (88, 22), (86, 20), (80, 16), (77, 8),
-     (73, 20), (68, 23), (66, 25), (61, 25), (57, 26), (53, 27), (50, 29),
+     (98, 10), (95, 16), (92, 22), (88, 22), (86, 20), (82, 17), (80, 13),
+     (77, 8), (75, 12), (73, 20), (68, 23),
+     (66, 25), (62, 25), (58, 24), (55, 25), (52, 26), (50, 28), (48, 29),
      (48, 30), (44, 29), (40, 31), (36, 36), (30, 36), (32, 42), (30, 46),
      (28, 50), (30, 55), (30, 60), (30, 66), (32, 70)],
     # Australia
@@ -290,6 +292,31 @@ CONTINENTS = [
     # New Guinea
     [(131, -1), (136, -2), (141, -3), (146, -6), (150, -10), (147, -9),
      (142, -8), (136, -4)],
+    # Madagascar
+    [(44, -12), (47, -15), (50, -16), (50, -20), (47, -25), (44, -25),
+     (43, -20), (44, -16)],
+    # New Zealand (North + South)
+    [(173, -35), (178, -38), (177, -40), (174, -41), (172, -40),
+     (173, -37)],
+    [(167, -45), (170, -43), (173, -42), (174, -40), (172, -41),
+     (168, -46)],
+    # Iceland
+    [(-22, 64), (-18, 66), (-14, 64), (-15, 63), (-20, 63)],
+    # Ireland
+    [(-10, 52), (-8, 55), (-6, 55), (-6, 52), (-8, 51)],
+    # Sri Lanka
+    [(80, 9), (82, 7), (81, 6), (80, 8)],
+    # Taiwan
+    [(120, 22), (122, 25), (121, 25), (120, 23)],
+    # Luzon + Mindanao
+    [(120, 18), (122, 14), (121, 13), (120, 16)],
+    [(122, 7), (126, 7), (126, 9), (122, 9)],
+    # Cuba + Hispaniola
+    [(-84, 22), (-80, 23), (-74, 20), (-77, 21), (-82, 22)],
+    [(-74, 20), (-72, 20), (-68, 18), (-71, 18)],
+    # Sicily + Tasmania
+    [(12, 38), (15, 37), (14, 36), (12, 37)],
+    [(145, -41), (148, -41), (148, -43), (145, -43)],
 ]
 
 
@@ -306,26 +333,60 @@ def art_bridge(d, x0, y0, x1, y1):
         wx = x0 + 8 + i * 23
         d.arc([wx, sea_y + 12, wx + 16, sea_y + 20], start=200, end=340,
               fill=(180, 210, 235), width=2)
-    # bridge deck with a gap in the middle
+    # bridge deck with a gap in the middle (road arch brought down)
     deck_y = y0 + (y1 - y0) * 0.52
     mid = (x0 + x1) // 2
     gap = 46
     d.rectangle([x0 + 6, deck_y, mid - gap // 2, deck_y + 7], fill=(90, 90, 90))
     d.rectangle([mid + gap // 2, deck_y, x1 - 6, deck_y + 7], fill=(90, 90, 90))
+    # deck railings + lane dashes
+    d.line([x0 + 6, deck_y - 3, mid - gap // 2, deck_y - 3],
+           fill=(70, 70, 70), width=1)
+    d.line([mid + gap // 2, deck_y - 3, x1 - 6, deck_y - 3],
+           fill=(70, 70, 70), width=1)
+    for lx in range(int(x0) + 14, int(x1) - 14, 18):
+        if abs(lx - mid) > gap // 2 + 4:
+            d.line([lx, deck_y + 3, lx + 8, deck_y + 3],
+                   fill=(220, 220, 220), width=1)
     # broken ends angled down into the sea
     d.polygon([(mid - gap // 2, deck_y), (mid - gap // 2 + 12, deck_y + 7),
                (mid - 8, sea_y + 2), (mid - 20, sea_y + 2)], fill=(110, 110, 110))
     d.polygon([(mid + gap // 2, deck_y), (mid + gap // 2 - 12, deck_y + 7),
                (mid + 8, sea_y + 2), (mid + 20, sea_y + 2)], fill=(110, 110, 110))
-    # piers
-    for px in (x0 + 40, x0 + 120, x1 - 120, x1 - 40):
+    # piers with caps
+    for px in (x0 + 40, x0 + 82, x0 + 124, x1 - 124, x1 - 82, x1 - 40):
         d.rectangle([px - 5, deck_y + 7, px + 5, sea_y + 2], fill=(120, 120, 120))
-    # arch hint
+        d.rectangle([px - 8, deck_y + 7, px + 8, deck_y + 10], fill=(90, 90, 90))
+    # arch + suspender cables (skip the destroyed middle span)
     d.arc([x0 + 60, deck_y - 26, x1 - 60, deck_y + 10], start=180, end=360,
-          fill=(70, 70, 70), width=3)
+          fill=(70, 70, 70), width=4)
+    acx = (x0 + x1) / 2
+    acy = deck_y - 8
+    arx = (x1 - x0 - 120) / 2
+    ary = 18
+    for sx in range(int(x0) + 70, int(x1) - 70, 22):
+        if abs(sx - mid) < gap // 2 + 6:
+            continue
+        t = (sx - acx) / arx
+        if abs(t) >= 1:
+            continue
+        ay = acy - ary * math.sqrt(1 - t * t)
+        d.line([sx, ay, sx, deck_y], fill=(100, 100, 100), width=1)
+    # falling debris + splash where the span hit the water
+    for dx, dy, s in ((-30, 16, 5), (-12, 24, 4), (18, 18, 5), (34, 26, 4)):
+        d.rectangle([mid + dx, deck_y + dy, mid + dx + s, deck_y + dy + s],
+                    fill=(80, 80, 80))
+    for sx in (mid - 26, mid + 14):
+        d.arc([sx, sea_y - 2, sx + 22, sea_y + 10], start=180, end=360,
+              fill=WHITE, width=2)
+    # small patrol boat
+    bx = x0 + 44
+    d.polygon([(bx, sea_y + 16), (bx + 34, sea_y + 16), (bx + 28, sea_y + 23),
+               (bx + 6, sea_y + 23)], fill=(50, 60, 80))
+    d.rectangle([bx + 12, sea_y + 10, bx + 20, sea_y + 16], fill=WHITE)
     # explosion + smoke at the gap
-    burst(d, mid, deck_y - 6, 13)
-    smoke(d, mid - 6, deck_y - 22, 7, puffs=4)
+    burst(d, mid, deck_y - 6, 14)
+    smoke(d, mid - 6, deck_y - 22, 8, puffs=6)
     # jets
     jet_shape(d, x0 + 52, y0 + 22, 26, INK)
     jet_shape(d, x1 - 56, y0 + 16, 22, INK, flip=True)
@@ -350,12 +411,33 @@ def art_hormuz(d, x0, y0, x1, y1):
     d.polygon(gulf, fill=SEA)
     # coast shading
     d.line(gulf[:-1], fill=(140, 120, 80), width=2)
-    # dashed drone route Iran -> Bahrain
+    # Qeshm island (small landmass in the strait)
+    qx, qy = x0 + w * 0.76, y0 + h * 0.40
+    d.ellipse([qx - 16, qy - 7, qx + 16, qy + 7], fill=(222, 206, 170),
+              outline=(140, 120, 80))
+    # mine markers in the strait shipping lane
+    for mx, my in ((0.66, 0.62), (0.72, 0.68), (0.60, 0.70)):
+        px, py = x0 + w * mx, y0 + h * my
+        d.ellipse([px - 3, py - 3, px + 3, py + 3], fill=BLACK)
+        for ang in (45, 135, 225, 315):
+            r = math.radians(ang)
+            d.line([px, py, px + 5 * math.cos(r), py + 5 * math.sin(r)],
+                   fill=BLACK, width=1)
+    # dashed tanker route through the strait
+    dashed_line(d, [(x0 + w * 0.36, y1 - 20), (x0 + w * 0.58, y0 + h * 0.72),
+                    (x0 + w * 0.80, y0 + h * 0.66), (x1 - 8, y0 + h * 0.60)],
+                (90, 60, 20), width=2)
+    # dashed drone route Iran -> Bahrain, with drone marks
     dashed_line(d, [(x0 + w * 0.52, y0 + h * 0.22), (x0 + w * 0.34, y0 + h * 0.34),
                     (x0 + w * 0.26, y0 + h * 0.52)], RED, width=2)
-    # dashed US strike route
+    for dx, dy in ((0.40, 0.30), (0.33, 0.40)):
+        px, py = x0 + w * dx, y0 + h * dy
+        d.line([px - 4, py - 4, px + 4, py + 4], fill=INK, width=2)
+        d.line([px - 4, py + 4, px + 4, py - 4], fill=INK, width=2)
+    # dashed US strike route, with a jet on it
     dashed_line(d, [(x0 + w * 0.40, y0 + h * 0.78), (x0 + w * 0.62, y0 + h * 0.55),
                     (x0 + w * 0.74, y0 + h * 0.42)], BLUE_DARK, width=2)
+    jet_shape(d, x0 + w * 0.46, y0 + h * 0.72, 20, BLUE_DARK)
     # Bahrain radar mark
     bx, by = x0 + w * 0.26, y0 + h * 0.52
     d.ellipse([bx - 9, by - 9, bx + 9, by + 9], outline=RED, width=2)
@@ -376,6 +458,12 @@ def art_hormuz(d, x0, y0, x1, y1):
     d.text((x0 + 6, y0 + h * 0.58), "BAHRAIN", font=f, fill=INK_SOFT)
     d.text((x0 + w * 0.74, y0 + h * 0.16), "QESHM", font=f, fill=INK_SOFT)
     d.text((x0 + w * 0.60, y1 - 30), "HORMUZ", font=F_SANS_B(10), fill=WHITE)
+    d.text((x0 + w * 0.06, y0 + h * 0.80), "UAE", font=F_SANS_B(9),
+           fill=INK_SOFT)
+    d.text((x0 + w * 0.42, y0 + h * 0.65), "MINES", font=F_SANS_B(8),
+           fill=WHITE)
+    d.text((x0 + w * 0.72, y0 + h * 0.54), "PERSIAN GULF",
+           font=F_SANS_B(8), fill=(220, 235, 245))
     banner(d, x0 + w * 0.30, y0 + h * 0.30, "DRONES DOWNED", F_SANS_B(9),
            WHITE, RED)
     banner(d, x0 + w * 0.55, y0 + h * 0.62, "US STRIKES", F_SANS_B(9),
@@ -426,8 +514,10 @@ def art_drones(d, x0, y0, x1, y1):
     d.line([cx, cy, cx + 4, y1 - 14], fill=INK_SOFT, width=3)
     d.arc([cx - 18, cy - 18, cx + 18, cy + 18], start=300, end=60,
           fill=RED, width=2)
+    # radar sweep
+    d.line([cx, cy, cx + 20, cy - 14], fill=RED, width=2)
     # drones with red X
-    for dx, dy in ((110, 14), (140, 30), (168, 12)):
+    for dx, dy in ((92, 20), (110, 14), (140, 30), (168, 12)):
         d.line([x0 + dx - 7, y0 + dy - 5, x0 + dx + 7, y0 + dy + 5],
                fill=INK, width=2)
         d.line([x0 + dx - 7, y0 + dy + 5, x0 + dx + 7, y0 + dy - 5],
@@ -456,6 +546,11 @@ def art_measles(d, x0, y0, x1, y1):
     d.line([x0 + 108, y0 + 40, x0 + 132, y0 + 26], fill=(100, 100, 100), width=5)
     d.line([x0 + 132, y0 + 26, x0 + 142, y0 + 20], fill=INK_SOFT, width=2)
     d.rectangle([x0 + 100, y0 + 36, x0 + 112, y0 + 46], fill=RED)
+    # crossed shield (protection lost)
+    d.polygon([(x0 + 160, y0 + 32), (x0 + 172, y0 + 36), (x0 + 172, y0 + 44),
+               (x0 + 160, y0 + 50), (x0 + 148, y0 + 44), (x0 + 148, y0 + 36)],
+              fill=(200, 220, 240), outline=INK_SOFT)
+    d.line([x0 + 150, y0 + 48, x0 + 170, y0 + 34], fill=RED, width=2)
     flag_us(d, x1 - 44, y0 + 4, 40, 17)
     d.rectangle([x0, y1 - 14, x1, y1], fill=BLUE_DARK)
     d.text((x0 + 5, y1 - 12), "PAHO · MEASLES", font=F_SANS_B(9), fill=WHITE)
@@ -473,6 +568,9 @@ def art_cop31(d, x0, y0, x1, y1):
     d.rectangle([tx, y0 + 8, tx + 8, y0 + 38], fill=WHITE, outline=INK)
     d.rectangle([tx + 1, y0 + 24, tx + 7, y0 + 38], fill=RED)
     d.ellipse([tx - 4, y0 + 34, tx + 12, y0 + 50], fill=RED)
+    # leaf sprig
+    d.ellipse([x0 + 58, y0 + 42, x0 + 70, y0 + 50], fill=(60, 150, 70))
+    d.ellipse([x0 + 66, y0 + 38, x0 + 78, y0 + 46], fill=(90, 180, 90))
     # draft paper
     px = x0 + 118
     d.rectangle([px, y0 + 8, px + 56, y0 + 44], fill=WHITE, outline=INK_SOFT)
@@ -496,6 +594,11 @@ def art_chip(d, x0, y0, x1, y1):
                fill=INK_SOFT, width=2)
         d.line([cx + dx * 10, cy + s // 2, cx + dx * 10, cy + s // 2 + 6],
                fill=INK_SOFT, width=2)
+    for dy in (-1, 0, 1):
+        d.line([cx - s // 2, cy + dy * 10, cx - s // 2 - 6, cy + dy * 10],
+               fill=INK_SOFT, width=2)
+        d.line([cx + s // 2, cy + dy * 10, cx + s // 2 + 6, cy + dy * 10],
+               fill=INK_SOFT, width=2)
     # rising chart
     pts = [(x0 + 84, y0 + 42), (x0 + 104, y0 + 34), (x0 + 124, y0 + 38),
            (x0 + 144, y0 + 24), (x0 + 166, y0 + 12)]
@@ -516,6 +619,11 @@ def art_gaza(d, x0, y0, x1, y1):
                    (x0 + tx + 36, y0 + 44)], fill=WHITE, outline=INK_SOFT)
         d.line([x0 + tx + 18, y0 + 20, x0 + tx + 18, y0 + 44],
                fill=GREY_LINE, width=1)
+    # red-cross flag on the middle tent
+    d.line([x0 + 80, y0 + 12, x0 + 80, y0 + 20], fill=INK_SOFT, width=1)
+    d.rectangle([x0 + 80, y0 + 12, x0 + 92, y0 + 18], fill=WHITE,
+                outline=INK_SOFT)
+    d.rectangle([x0 + 84, y0 + 13, x0 + 88, y0 + 17], fill=RED)
     # aid truck
     d.rectangle([x0 + 142, y0 + 26, x0 + 182, y0 + 44], fill=WHITE,
                 outline=INK_SOFT)
@@ -538,6 +646,10 @@ def art_ebola(d, x0, y0, x1, y1):
               fill=RED)
     d.rectangle([x0 + 40, y0 + 24, x0 + 52, y0 + 36], fill=RED)
     d.rectangle([x0 + 44, y0 + 20, x0 + 48, y0 + 40], fill=RED)
+    # annex tent
+    d.polygon([(x0 + 82, y0 + 48), (x0 + 94, y0 + 30), (x0 + 106, y0 + 48)],
+              fill=WHITE, outline=INK_SOFT)
+    d.rectangle([x0 + 92, y0 + 38, x0 + 96, y0 + 44], fill=RED)
     # virus
     for cx, cy, r in ((x0 + 116, y0 + 20, 9), (x0 + 146, y0 + 34, 7),
                       (x0 + 168, y0 + 16, 6)):
@@ -554,11 +666,18 @@ def art_ebola(d, x0, y0, x1, y1):
 
 def art_jets(d, x0, y0, x1, y1):
     d.rectangle([x0, y0, x1, y1], fill=SKY_LIGHT)
-    # rising sun
+    # rising sun with rays
     d.ellipse([x1 - 46, y0 + 6, x1 - 10, y0 + 42], fill=(188, 0, 45))
+    for ang in (200, 230, 260):
+        r = math.radians(ang)
+        sx, sy = x1 - 28, y0 + 24
+        d.line([sx + 18 * math.cos(r), sy + 18 * math.sin(r),
+                sx + 26 * math.cos(r), sy + 26 * math.sin(r)],
+               fill=(188, 0, 45), width=2)
     jet_shape(d, x0 + 52, y0 + 22, 34, INK)
     jet_shape(d, x0 + 118, y0 + 38, 28, (90, 90, 90), flip=True)
     d.line([x0 + 70, y0 + 26, x0 + 100, y0 + 32], fill=INK_SOFT, width=1)
+    d.line([x0 + 132, y0 + 42, x0 + 158, y0 + 46], fill=INK_SOFT, width=1)
     banner(d, x0 + 10, y0 + 32, "SCRAMBLED", F_SANS_B(9), WHITE, RED)
     d.rectangle([x0, y1 - 14, x1, y1], fill=BLUE_DARK)
     d.text((x0 + 5, y1 - 12), "JAPAN · AIRSPACE", font=F_SANS_B(9), fill=WHITE)
@@ -576,11 +695,14 @@ def art_bank(d, x0, y0, x1, y1):
     d.line([x0 + 130, y0 + 10, x0 + 130, y0 + 38], fill=RED, width=4)
     d.polygon([(x0 + 130, y0 + 46), (x0 + 121, y0 + 34), (x0 + 139, y0 + 34)],
               fill=RED)
+    d.rectangle([x0 + 152, y0 + 10, x0 + 184, y0 + 42], fill=(225, 225, 225),
+                outline=INK_SOFT)
     d.rectangle([x0 + 148, y0 + 14, x0 + 180, y0 + 46], fill=WHITE,
                 outline=INK_SOFT)
     for i in range(3):
         d.line([x0 + 153, y0 + 20 + i * 8, x0 + 175, y0 + 20 + i * 8],
                fill=GREY_LINE, width=2)
+    d.text((x0 + 142, y0 + 2), "15M DOCS", font=F_SANS_B(8), fill=INK_SOFT)
     banner(d, x0 + 100, y0 + 30, "-6%", F_SANS_B(10), WHITE, RED)
     d.rectangle([x0, y1 - 14, x1, y1], fill=BLUE_DARK)
     d.text((x0 + 5, y1 - 12), "FRANKFURT · LEAK", font=F_SANS_B(9), fill=WHITE)
@@ -594,6 +716,9 @@ def art_resignation(d, x0, y0, x1, y1):
     for i in range(4):
         d.line([x0 + 32, y0 + 13 + i * 7, x0 + 100, y0 + 13 + i * 7],
                fill=GREY_LINE, width=2)
+    # signature squiggle
+    d.line([(x0 + 32, y0 + 40), (x0 + 38, y0 + 36), (x0 + 44, y0 + 41),
+            (x0 + 50, y0 + 37), (x0 + 56, y0 + 40)], fill=INK_SOFT, width=1)
     d.ellipse([x0 + 88, y0 + 34, x0 + 102, y0 + 48], fill=RED)
     flag_mongolia(d, x0 + 128, y0 + 12, 48, 28)
     banner(d, x0 + 120, y0 + 32, "TO RESIGN", F_SANS_B(9), WHITE, BLUE_DARK)
@@ -603,6 +728,9 @@ def art_resignation(d, x0, y0, x1, y1):
 
 def art_cyclone(d, x0, y0, x1, y1):
     d.rectangle([x0, y0, x1, y1], fill=(210, 232, 245))
+    # rain bands
+    for rx in range(int(x0) + 8, int(x1) - 8, 18):
+        d.line([rx, y0 + 4, rx - 4, y0 + 12], fill=(90, 140, 190), width=1)
     # spiral
     cx, cy = x0 + 52, y0 + 26
     for r in (8, 14, 20, 26):
@@ -625,6 +753,23 @@ ART_FUNCS = {
     "chip": art_chip, "gaza": art_gaza, "ebola": art_ebola,
     "jets": art_jets, "bank": art_bank, "resignation": art_resignation,
     "cyclone": art_cyclone,
+}
+
+SEC_ROW_H = 146  # vertical pitch of the secondary-story rows
+
+# bottom-strip captions for the secondary art panels (re-drawn in the
+# story's region colour by draw_second)
+STRIP_LABELS = {
+    "drones": "BAHRAIN · US RADAR",
+    "measles": "PAHO · MEASLES",
+    "cop31": "ANTALYA · COP31",
+    "chip": "AI CHIPS · WALL ST",
+    "gaza": "GAZA · CROSSINGS",
+    "ebola": "DR CONGO · EBOLA",
+    "jets": "JAPAN · AIRSPACE",
+    "bank": "FRANKFURT · LEAK",
+    "resignation": "ULAANBAATAR",
+    "cyclone": "COOK ISLANDS",
 }
 
 
@@ -682,19 +827,39 @@ def draw_lead(d, story, x0, y0, col_w):
 
 
 def draw_second(d, story, x0, y0, col_w):
-    art_h = 62
+    art_h = 66
     ART_FUNCS[story["art"]](d, x0, y0, x0 + col_w, y0 + art_h)
+    # region-coloured bottom strip over the art (replaces uniform blue)
+    strip_col = REGION_COLORS[region_key(story["region"])]
+    d.rectangle([x0, y0 + art_h - 14, x0 + col_w, y0 + art_h],
+                fill=strip_col)
+    d.text((x0 + 5, y0 + art_h - 12), STRIP_LABELS[story["art"]],
+           font=F_SANS_B(9), fill=WHITE)
     d.rectangle([x0, y0, x0 + col_w, y0 + art_h], outline=INK, width=1)
     color = REGION_COLORS[story["region"]]
     y = y0 + art_h + 3
     tag = "%d  %s · %s" % (story["n"], story["region"], story["field"])
     d.text((x0, y), tag, font=F_SANS_B(10), fill=color)
     y += 14
-    f_head, lines = fit_lines(d, story["headline"], [15, 14, 13], col_w, 2)
+    f_head, lines = fit_lines(d, story["headline"], [16, 15, 14], col_w, 2)
     y = draw_lines(d, x0, y, lines, f_head, INK, f_head.size + 2)
     y += 2
-    f_deck, dlines = fit_lines(d, story["deck"], [11, 10, 9], col_w, 2,
-                               serif=False, bold=False)
+    # deck fills the space the headline left: 3 lines when the headline
+    # took one line, else 2 — largest font that fits the row budget,
+    # never dropping words
+    row_bottom = y0 + SEC_ROW_H
+    max_deck = 3 if len(lines) == 1 else 2
+    f_deck = dlines = None
+    for size in (12, 11, 10):
+        cand = F_SANS(size)
+        wrapped = wrap_text(d, story["deck"], cand, col_w)
+        if (len(wrapped) <= max_deck
+                and len(wrapped) * (size + 2) <= row_bottom - y):
+            f_deck, dlines = cand, wrapped
+            break
+    if f_deck is None:
+        f_deck = F_SANS(10)
+        dlines = wrap_text(d, story["deck"], f_deck, col_w)
     draw_lines(d, x0, y, dlines, f_deck, INK_SOFT, f_deck.size + 2)
 
 
@@ -735,16 +900,22 @@ def draw_also_list(d, x0, y0, x1, y1, briefs):
     cols = [briefs[:half], briefs[half:]]
     rows = max(len(c) for c in cols)
     leading = (y1 - y0) / rows
-    f_num = F_SANS_B(11)
+    f_num = F_SANS_B(8)
     f_txt = F_SANS(11)
     for ci, col in enumerate(cols):
         cx = x0 + ci * (col_w + col_gap)
         for ri, b in enumerate(col):
             yy = y0 + ri * leading
             num = "%d" % b["n"]
-            d.text((cx, yy), num, font=f_num,
-                   fill=REGION_COLORS[region_key(b["region"])])
-            nx = cx + d.textlength(num + " ", font=f_num)
+            col = REGION_COLORS[region_key(b["region"])]
+            # pill badge: region colour, white number (8 px tall so the
+            # tight 9.6 px leading keeps a gap between neighbours)
+            bw = d.textlength(num, font=f_num) + 6
+            by = yy + (leading - 8) / 2
+            d.rounded_rectangle([cx, by, cx + bw, by + 8], radius=4,
+                                fill=col)
+            d.text((cx + 3, yy + 0.5), num, font=f_num, fill=WHITE)
+            nx = cx + bw + 4
             fnt = f_txt
             if d.textlength(b["text"], font=fnt) > col_w - (nx - cx):
                 fnt = fit_font(d, b["text"], 11, col_w - (nx - cx),
@@ -806,7 +977,7 @@ def build_page(data):
     seconds = [s for s in stories if s["tier"] == "second"]
     scol_w = (CONTENT_W - 4 * gap) / 5
     for row in range(2):
-        y = 388 + row * 146
+        y = 388 + row * SEC_ROW_H
         for i in range(5):
             s = seconds[row * 5 + i]
             draw_second(d, s, MARGIN + i * (scol_w + gap), y, scol_w)
